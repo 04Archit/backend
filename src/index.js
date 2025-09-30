@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "./constants";
 
-(async () => {
-  try {
-    await mongoose.connect(`${process.env.MONGODB_URL}/${DB_NAME}`);
-  } catch (err) {
-    console.error("ERROR: ", err);
-  }
-})();
+// (async () => {
+//   try {
+//     await mongoose.connect(`${process.env.MONGODB_URL}/${DB_NAME}`);
+//   } catch (err) {
+//     console.error("ERROR: ", err);
+//   }
+// })();
