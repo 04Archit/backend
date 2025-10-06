@@ -8,7 +8,23 @@ import { connectDB } from "../src/db/index.js";
 dotenv.config({
   path: "./env",
 });
-connectDB();
+connectDB()
+  .then(()=>{
+    
+  })
+  .catch((err) => {
+    console.error("db connection failed!!", err);
+  });
+
+
+
+
+
+
+
+
+
+
 
 // import express from "express";
 // const app = express();
