@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 // import mongoose from "mongoose";
 // import { DB_NAME } from "./constants.js";
 import { connectDB } from "../src/db/index.js";
+import { app } from "../src/app.js";
 
 dotenv.config({
   path: "./env",
@@ -18,9 +19,6 @@ connectDB()
     console.error("db connection failed!!", err);
   });
 
-
-
-  
 // import express from "express";
 // const app = express();
 
