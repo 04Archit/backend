@@ -19,6 +19,8 @@ connectDB()
     console.error("db connection failed!!", err);
   });
 
+
+// 1st way of writing the code to connect to the database. 
 // import express from "express";
 // const app = express();
 
