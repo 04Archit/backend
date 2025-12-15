@@ -1,4 +1,4 @@
-class APIResponse {
+export class APIResponse {
   constructor(statusCode, Data, Message = "Success") {
     this.statusCode = statusCode;
     this.Data = Data;

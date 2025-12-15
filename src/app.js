@@ -23,6 +23,7 @@ import  {router}  from "../src/routes/user.routes.js";
 
 
 // routes declaration
-app.use("/api/v1/users", router);
+app.use("/api/v1/users", router); // app.use is used instead of app.get because things are now separated and that i have extracted router from express in a different file, so as to use router in this file i would have to bring and use middleware here!!
 
 export { app };
+ 
