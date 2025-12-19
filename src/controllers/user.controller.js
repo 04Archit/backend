@@ -4,6 +4,24 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { APIResponse } from "../utils/APIResponse.js";
 
+const generateAccessTokenandRefreshToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accesstoken = user.generateAccessToken();
+    const refreshtoken = user.generateRefreshToken();
+
+    user.refreshtoken = refreshtoken;
+    await user.save({ validateBeforeSave: false });
+
+    return { accesstoken, refreshtoken };
+  } catch (err) {
+    throw new APIError(
+      500,
+      "something went wrong while generating refresh and access token"
+    );
+  }
+};
+
 export const registeruser = asyncHandler(async (req, res) => {
   // get user details from frontend
   // validation - not empty
@@ -67,8 +85,60 @@ export const registeruser = asyncHandler(async (req, res) => {
     throw new APIError(500, "something went wrong while registering a user");
   }
 
-  return res.status(201).json(
-   new APIResponse(200, createduser, "User registered successfully")
-  )
+  return res
+    .status(201)
+    .json(new APIResponse(200, createduser, "User registered successfully"));
+});
 
+export const loginuser = asyncHandler(async (req, res) => {
+  // req.body -> data
+  // username or email
+  // find the user
+  // password check
+  // access and refresh token
+  // send cookie
+
+  const { email, username, password } = req.body;
+
+  if (!username || !email) {
+    throw new APIError(400, "username or password is required");
+  }
+
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (!user) {
+    throw new APIError(404, "user does not exist");
+  }
+
+  const passwordvalid = await user.isPasswordCorrect(password);
+
+  if (!passwordvalid) {
+    throw new APIError(401, "invalid password");
+  }
+
+  const { accesstoken, refreshtoken } =
+    await generateAccessTokenandRefreshToken(user._id);
+
+  const loggeduser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("accesstoken", accesstoken, options)
+    .cookie("refreshtoken", refreshtoken, options)
+    .json(
+      new APIResponse(200, {
+        user: loggeduser,
+        accesstoken,
+        refreshtoken,
+      }, "user loggen in successfully")
+    );
 });
