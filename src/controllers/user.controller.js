@@ -118,7 +118,7 @@ export const loginuser = asyncHandler(async (req, res) => {
     throw new APIError(401, "invalid password");
   }
 
-  const { accesstoken, refreshtoken } =
+  const { accessToken, refreshToken } =
     await generateAccessTokenandRefreshToken(user._id);
 
   const loggeduser = await User.findById(user._id).select(
@@ -132,13 +132,43 @@ export const loginuser = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .cookie("accesstoken", accesstoken, options)
-    .cookie("refreshtoken", refreshtoken, options)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
     .json(
-      new APIResponse(200, {
-        user: loggeduser,
-        accesstoken,
-        refreshtoken,
-      }, "user loggen in successfully")
+      new APIResponse(
+        200,
+        {
+          user: loggeduser,
+          accessToken,
+          refreshToken,
+        },
+        "user logged in successfully"
+      )
     );
 });
+
+export const logoutuser = asyncHandler(async (req, res) => {
+  const deletetoken = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: undefined,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new APIResponse(200, {}, "user logged out"));
+});
+ 
